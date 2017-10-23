@@ -5,6 +5,11 @@ var bodyParser = require('body-parser');
 var batu_http = require('./batu.js');
 var Sequelize = require('sequelize');
 var ip = require('ip');
+var SSDP = require('node-ssdp').Server;
+
+
+
+
 var sequelize = new Sequelize('vm_db', null, null, {
 	dialect:"sqlite",
 	storage:"./db.sqlite"
@@ -52,16 +57,34 @@ var host_config_path = "conf/host_config.json";
 var config_path = "conf/config.json";
 var vm_list_path = "conf/vm_list.json";
 
-
 batu_http.LoadFileJson(host_config_path, function(err, data){
 		batu_config = data;
-		if(batu_config.host_type === 'master')
+		if(batu_config.host_type === "master")
 		{
 
 			GROUP_MEMBER = sequelize.define('GROUP_MEMBER', {
 					address		: {type: Sequelize.STRING, allowNull:false, unique:true}
 			});
 			GROUP_MEMBER.sync();
+	
+	
+	
+			ssdp_server = new SSDP({
+						 location: require('ip').address() + ':10000/config',
+					   sourcePort: 1900			    
+			});
+
+
+
+
+			ssdp_server.addUSN('urn:schemas-upnp-org:service:ContentDirectory:1')
+
+			ssdp_server.on('advertise-alive', function (heads) { } );
+			ssdp_server.on('advertise-bye', function (heads) { } );
+			ssdp_server.start();
+
+			console.log("master-host start");	
+	
 		}
 });
 
@@ -201,8 +224,14 @@ http_app.post('/master/group/join', function(req,res){
 		return res.end(JSON.stringify({message:"Host Type is Not Master."}))	
 	}
 	try
-	{	
-	GROUP_MEMBER.create({address:req.connection.remoteAddress});
+	{
+
+	var remote_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	if (remote_ip.substr(0, 7) == "::ffff:") {
+		  remote_ip = remote_ip.substr(7)
+	}
+
+	GROUP_MEMBER.create({address:remote_ip});
 	}catch(e)
 	{};
 
