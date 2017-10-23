@@ -63,7 +63,11 @@ batu_http.LoadFileJson(host_config_path, function(err, data){
 		{
 
 			GROUP_MEMBER = sequelize.define('GROUP_MEMBER', {
-					address		: {type: Sequelize.STRING, allowNull:false, unique:true}
+					
+					
+					address		: {type: Sequelize.STRING, allowNull:false, unique:true},
+					config		: {type: Sequelize.STRING, allowNull:false}
+			
 			});
 			GROUP_MEMBER.sync();
 	
@@ -223,6 +227,21 @@ http_app.post('/master/group/join', function(req,res){
 		res.writeHead(401);
 		return res.end(JSON.stringify({message:"Host Type is Not Master."}))	
 	}
+
+	if(!req.body.config)
+	{
+	
+		res.writeHead(401);
+		return res.end(JSON.stringify({message:"\"config\" require"}))	
+	}
+
+	if(!batu_http.CheckJSON(req.body.config))
+	{
+		res.writeHead(400);
+		return res.end(JSON.stringify({message:"\"data\" is not JSON"}))	
+	}
+	
+
 	try
 	{
 
@@ -231,7 +250,7 @@ http_app.post('/master/group/join', function(req,res){
 		  remote_ip = remote_ip.substr(7)
 	}
 
-	GROUP_MEMBER.create({address:remote_ip});
+	GROUP_MEMBER.create({address:remote_ip, config:req.body.config});
 	}catch(e)
 	{};
 
@@ -275,3 +294,41 @@ http_app.get('/master/group/list', function(req, res)
 });
 
 
+
+http_app.post('/master/config/update', function(req, res)
+{
+
+	if(!(batu_config.host_type === 'master'))
+	{
+		res.writeHead(401);
+		return res.end(JSON.stringify({message:"Host Type is Not Master."}))	
+	}	
+
+	if(!req.body.config)
+	{
+	
+		res.writeHead(401);
+		return res.end(JSON.stringify({message:"\"config\" require"}))	
+	}	
+	
+	if(!batu_http.CheckJSON(req.body.config))
+	{
+		res.writeHead(400);
+		return res.end(JSON.stringify({message:"\"config\" is not JSON"}))	
+	}
+
+	var remote_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	if (remote_ip.substr(0, 7) == "::ffff:") {
+		  remote_ip = remote_ip.substr(7)
+	}
+
+
+	GROUP_MEMBER.update(
+	{ config: req.body.config },
+	{ where: {address:remote_ip }}
+	);	
+	
+
+	res.writeHead(200);
+	res.end(JSON.stringify({message:"ok"}));
+});
