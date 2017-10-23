@@ -268,7 +268,7 @@ http_app.get('/master/group/list', function(req, res)
 	}
 	GROUP_MEMBER.findAll().then(result=>{	
 	res.writeHead(200);
-	res.end(JSON.stringify({ master:ip.address(), member:result}));
+	res.end(JSON.stringify({ master:ip.address(), members:result}));
 	});
 	
 
