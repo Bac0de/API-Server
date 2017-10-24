@@ -1,6 +1,7 @@
 var express = require('express');
 var fs = require('fs');
 var http_app = express();
+var exec = require('child_process');
 var bodyParser = require('body-parser');
 var batu_http = require('./batu.js');
 var Sequelize = require('sequelize');
