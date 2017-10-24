@@ -198,12 +198,13 @@ http_app.post('/common/vm/control', function(req,res){
 	}
 
 
-	script.http_command(data.command);
+	 exec(data.command, function(error, stdout, stderr){ console.log(stdout);     });
+
+
 
 	res.writeHead(200);
 	return res.end(JSON.stringify({message:"ok"}))	
 
-	//exec( Secure Issue )	
 });
 
 http_app.get('common/vm/stats' , function(req, res)
