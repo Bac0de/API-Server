@@ -33,6 +33,20 @@ exports.Execute = function(command, callback){
     exec(command, function(error, stdout, stderr){ callback(stdout); });
 }
 
+exports.LoadJsonSync = function(path)
+{
+	var json_str = fs.readFileSync(path);	
+
+	if(!json_str)
+		return null;
+	try{
+		return JSON.parse(json_str);
+	} catch(e)
+	{
+		return null;
+	}
+}
+
 
 exports.SaveFileJson = function(path,data, cb)
 {
