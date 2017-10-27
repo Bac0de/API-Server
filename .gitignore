@@ -1,6 +1,7 @@
 
 
-db.sqlite
+*.sqlite
+
 node_modules/
 *.*.swp
 *.*.swo
