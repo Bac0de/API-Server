@@ -1,0 +1,8 @@
+{
+	"name": "BATU LOCAL SERVER API DOC",
+	"version": "0.0.1",
+	"description": "Batu Server Api Documentation",
+	"url": "LocalAddress:10000",
+	"order": [
+	]
+}
