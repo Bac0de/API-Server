@@ -1,0 +1,37 @@
+{
+  "name": "api-server",
+  "version": "0.0.1",
+  "description": "API server for managing Batu network",
+  "main": "Start.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "ip": "^1.1.5",
+    "node-ssdp": "^3.2.5",
+    "sequelize": "^4.23.2",
+    "sequelize-cli": "^3.0.0",
+    "sqlite3": "^3.1.13"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node Start.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bac0de/API-Server.git"
+  },
+  "keywords": [
+    "Batu"
+  ],
+  "author": "oh3vci",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/Bac0de/API-Server/issues"
+  },
+  "homepage": "https://github.com/Bac0de/API-Server#readme"
+}
