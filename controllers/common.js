@@ -1,13 +1,10 @@
 var exec = require('child_process').exec;
 var router = require('express').Router();
 var fs = require('fs');
-var Sequelize = require('sequelize');
-var VM = sequelize.import('../models/vm.js');
 var batu = require('../helpers/batu.js');
 var server_config = batu.LoadJsonSync('config/config.json'); 
-
-
-
+var Sequelize = require('sequelize');
+var VM = sequelize.import('../models/vm.js');
 
 /**
  * @api {get} /common/config GET Batu Config.
@@ -31,20 +28,17 @@ var server_config = batu.LoadJsonSync('config/config.json');
  *		}
  */
 
-router.get('/config', function(req, res)
-{
-	fs.readFile(server_config.conf_dir, function(err, data){
-	if (err)
-	{
-			res.writeHead(404);
-			res.end(JSON.stringify(err));
-			return callback_error_handler({message:"Cannot Read Config.json"});
-	}
-	res.writeHead(200);
-	res.end(data);})	
+router.get('/config', function (req, res) {
+	fs.readFile(server_config.conf_dir, function (err, data) {
+		if (err) {
+				res.writeHead(404);
+				res.end(JSON.stringify(err));
+				return callback_error_handler({message: "Cannot Read Config.json"});
+		}
+		res.writeHead(200);
+		res.end(data);
+	});
 });
-
-
 
 /**
  * @api {get} /common/vm/list GET Get VM List.
@@ -73,11 +67,13 @@ router.get('/config', function(req, res)
  *
  *
  */
-router.get('/vm/list', function(req, res){
+
+router.get('/vm/list', function (req, res) {
 	res.writeHead(200);
-	VM.findAll().then(result=>{	
-	res.end(JSON.stringify(result));
-	});
+	VM.findAll()
+		.then(result => {
+			res.end(JSON.stringify(result));
+		});
 });
 
 
@@ -111,34 +107,35 @@ router.get('/vm/list', function(req, res){
  *			"message":"Parameter \"data\" require"
  *		}
  */
-router.post('/vm/add',function(req, res){
-	if(!req.body.data)
-	{
+
+router.post('/vm/add',function (req, res) {
+	if (!req.body.data) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"Parameter \"data\" require"}))	
+		return res.end(JSON.stringify({message: "Parameter \"data\" require"}));
 	}
-	if(!batu.CheckJSON(req.body.data))
-	{
+
+	if (!batu.CheckJSON(req.body.data)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data\" is not JSON"}))	
+		return res.end(JSON.stringify({message: "\"data\" is not JSON"}));
 	}
 
 	var data = JSON.parse(req.body.data);
 	
-	if(!(data.nickname && 
+	if (!(data.nickname && 
 		 data.cpu_core && 
-		 data.main_memory && 
+		 data.main_memory &&
 		 data.disk_memory &&
-		 data.start_command) )
-	{
-	 
+		 data.start_command)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"not fill data field"}))	
+
+		return res.end(JSON.stringify({message: "not fill data field"}));
 	}
 
 	res.writeHead(200);
+
 	vm_obj = VM.create(data);
-	return res.end(JSON.stringify({message:"ok"}))
+
+	return res.end(JSON.stringify({message: "ok"}));
 });
 
 
@@ -173,46 +170,50 @@ router.post('/vm/add',function(req, res){
  *			"message":"Parameter \"data\" require"
  *		}
  */
-router.post('/vm/update', function(req,res)
-{
-	
-	if(!req.body.data)
-	{
+router.post('/vm/update', function (req,res) {
+	if(!req.body.data) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"Parameter \"data\" require"}))	
+		return res.end(JSON.stringify({message: "Parameter \"data\" require"}))	
 	}
-	if(!batu.CheckJSON(req.body.data))
-	{
+
+	if(!batu.CheckJSON(req.body.data)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data\" is not JSON"}))	
+		return res.end(JSON.stringify({message: "\"data\" is not JSON"}))	
 	}
 
 	var data = JSON.parse(req.body.data);
 	
-	if(!(data.nickname && 
-		 data.cpu_core && 
+	if (!(data.nickname &&
+		 data.cpu_core &&
 		 data.main_memory && 
 		 data.disk_memory &&
-		 data.start_command) )
-	{
-	 
+		 data.start_command)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"not fill data field"}))	
+		return res.end(JSON.stringify({message: "not fill data field"}));
 	}
 
-	VM.update({nickname:data.nickname, cpu_core:data.cpu_core, 	
-		main_memory: data.main_memory,disk_memory:data.disk_memory,
-	   	start_command:data.start_command},{where: {id:data.id}}).then(function(result){
-
-				res.writeHead(200);
-				return res.end(JSON.stringify({message:"ok"}))
-
-
-			}).catch(function(err){	
-				res.writeHead(400);
-				return res.end(JSON.stringify({message:result}))
-
-			});
+	VM.update(
+		{
+			nickname: data.nickname,
+			cpu_core: data.cpu_core,
+			main_memory: data.main_memory,
+			disk_memory: data.disk_memory,
+			start_command: data.start_command
+		},
+		{
+			where: {
+				id: data.id
+			}
+		}
+	)
+	.then(function (result) {
+		res.writeHead(200);
+		return res.end(JSON.stringify({message: "ok"}));
+	})
+	.catch(function (err) {	
+		res.writeHead(400);
+		return res.end(JSON.stringify({message: result}));
+	});
 });
 
 /**
@@ -241,21 +242,19 @@ router.post('/vm/update', function(req,res)
  *		}
  */
 
-router.post('/vm/delete', function(req, res)
-{
-	
-	if(!req.body.id)
-	{
+router.post('/vm/delete', function (req, res) {
+	if(!req.body.id) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"Parameter \"id\" require"}))	
+		return res.end(JSON.stringify({message: "Parameter \"id\" require"}));
 	}
 
-	var id = req.body.id;	
-	
-	VM.distory({where : id})
-	
+	var id = req.body.id;
+
+	VM.distory({where: id});
+
 	res.writeHead(200);
-	return res.end(JSON.stringify({message:"ok"}))	
+
+	return res.end(JSON.stringify({message: "ok"}));
 });
 
 /**
@@ -283,47 +282,41 @@ router.post('/vm/delete', function(req, res)
  *			"message":"Parameter \"data\" require"
  *		}
  */
-router.post('/vm/control', function(req,res){
+router.post('/vm/control', function (req,res) {
+	if(!req.body.data) {
+		res.writeHead(400);
+		return res.end(JSON.stringify({message: "Parameter \"data\" require"}));
+	}
 
-	if(!req.body.data)
-	{
+	if(!batu.CheckJSON(req.body.data)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"Parameter \"data\" require"}))	
+		return res.end(JSON.stringify({message: "\"data\" is not JSON"}));
 	}
-	if(!batu.CheckJSON(req.body.data))
-	{
-		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data\" is not JSON"}))	
-	}
+
 	data = JSON.parse(req.body.data);
-	if(!data.command)
-	{
+
+	if(!data.command) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data.command\" is not found"}))	
+		return res.end(JSON.stringify({message: "\"data.command\" is not found"}));
 	}
 
-
-	 exec(data.command, function(error, stdout, stderr){ console.log(stdout);     });
-
-
+	exec(data.command, function (error, stdout, stderr) {
+		console.log(stdout);
+	});
 
 	res.writeHead(200);
-	return res.end(JSON.stringify({message:"ok"}))	
 
+	return res.end(JSON.stringify({message: "ok"}));
 });
 
-router.get('/vm/stats' , function(req, res)
-{
-	if(!req.query.vm_id)
-	{
+router.get('/vm/stats' , function (req, res) {
+	if(!req.query.vm_id) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"Parameter \"data\" require"}))	
+		return res.end(JSON.stringify({message: "Parameter \"data\" require"}));
 	}
-	
-	//get vm status code
-	
+	//get vm status code	
 	res.writeHead(200);
-	return res.end()		
+	return res.end();
 });
 
 
