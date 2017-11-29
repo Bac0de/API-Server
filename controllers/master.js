@@ -3,8 +3,6 @@ var GROUP_MEMBERS = sequelize.import('../models/group_members.js');
 var batu = require('../helpers/batu.js');
 var ip = require('ip');
 
-
-
 /**
  * @api {post} /master/group/join POST Join The Group.
  * @apiName JoinGroup
@@ -23,99 +21,80 @@ var ip = require('ip');
  *		}
  */
 
-router.post('/group/join', function(req,res){
-	if(!(batu_config.host_type === 'master'))
-	{
+router.post('/group/join', function (req,res) {
+	if (!(batu_config.host_type === 'master')) {
 		res.writeHead(401);
-		return res.end(JSON.stringify({message:"Host Type is Not Master."}))	
+		return res.end(JSON.stringify({message:"Host Type is Not Master."}));
 	}
 
-	if(!req.body.config)
-	{
-	
+	if (!req.body.config) {
 		res.writeHead(401);
-		return res.end(JSON.stringify({message:"\"config\" require"}))	
+		return res.end(JSON.stringify({message:"\"config\" require"}));
 	}
 
-	if(!batu.CheckJSON(req.body.config))
-	{
+	if (!batu.CheckJSON(req.body.config)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data\" is not JSON"}))	
-	}
-	
-
-	try
-	{
-
-	var remote_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	if (remote_ip.substr(0, 7) == "::ffff:") {
-		  remote_ip = remote_ip.substr(7)
+		return res.end(JSON.stringify({message:"\"data\" is not JSON"}));
 	}
 
-	GROUP_MEMBERS.create({address:remote_ip, config:req.body.config});
-	}catch(e)
-	{};
+	try {
+		var remote_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		if (remote_ip.substr(0, 7) == "::ffff:") {
+			remote_ip = remote_ip.substr(7);
+		}
 
-	//some info
-	
+		GROUP_MEMBERS.create({address:remote_ip, config:req.body.config});
+	} catch (e) {
+	};
+
 	res.writeHead(200);
-	res.end(JSON.stringify({message:'ok'}));
+	res.end(JSON.stringify({message: 'ok'}));
 });
 
-
-router.post('/vm/clone' , function(req, res)
-{
-	
-	if(!req.body.data)
-	{
+router.post('/vm/clone' , function (req, res) {
+	if (!req.body.data) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"Parameter \"data\" require"}))	
+		return res.end(JSON.stringify({message: "Parameter \"data\" require"}));
 	}
-	if(!batu.CheckJSON(req.body.data))
-	{
+	if (!batu.CheckJSON(req.body.data)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data\" is not JSON"}))	
+		return res.end(JSON.stringify({message: "\"data\" is not JSON"}));
 	}
 	data = JSON.parse(req.body.data);
-	if(!data.command)
-	{
+	if (!data.command) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data.command\" is not found"}))	
+		return res.end(JSON.stringify({message: "\"data.command\" is not found"}));
 	}
 
-
-	exec(data.command, function(error, stdout, stderr){ console.log(stdout);     });
+	exec(data.command, function (error, stdout, stderr) {
+		console.log(stdout);
+	});
 
 	res.writeHead(200);
-	return res.end(JSON.stringify({message:"ok"}))	
-
-	
+	return res.end(JSON.stringify({message: "ok"}));
 });
 
-router.get('/vm/clone/status', function(req, res)
-{
-	if(!req.body.data)
-	{
+router.get('/vm/clone/status', function (req, res) {
+	if (!req.body.data) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"Parameter \"data\" require"}))	
+		return res.end(JSON.stringify({message: "Parameter \"data\" require"}));
 	}
-	if(!batu.CheckJSON(req.body.data))
-	{
+	if (!batu.CheckJSON(req.body.data)) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data\" is not JSON"}))	
+		return res.end(JSON.stringify({message: "\"data\" is not JSON"}));
 	}
 	data = JSON.parse(req.body.data);
-	if(!data.command)
-	{
+	if (!data.command) {
 		res.writeHead(400);
-		return res.end(JSON.stringify({message:"\"data.command\" is not found"}))	
+		return res.end(JSON.stringify({message: "\"data.command\" is not found"}));
 	}
 
-
-	 exec(data.command, function(error, stdout, stderr){ console.log(stdout);     });
+	exec(data.command, function (error, stdout, stderr) {
+		console.log(stdout);
+	});
 
 	res.writeHead(200);
-	return res.end(JSON.stringify({message:"ok"}))	
+	return res.end(JSON.stringify({message: "ok"}));
 });
 
 
@@ -146,21 +125,12 @@ router.get('/vm/clone/status', function(req, res)
  *		}
  */
 
-router.get('/group/list', function(req, res)
-{
-	if(!(batu_config.host_type === 'master'))
-	{
-		res.writeHead(401);
-		return res.end(JSON.stringify({message:"Host Type is Not Master."}))	
-	}
-	GROUP_MEMBERS.findAll().then(result=>{	
-	res.writeHead(200);
-	res.end(JSON.stringify({ master:ip.address(), members:result}));
+router.get('/group/list', (req, res) => {
+	GROUP_MEMBERS.findAll().then (result => {	
+		res.writeHead(200);
+		res.end(JSON.stringify({ master:ip.address(), members:result}));
 	});
-	
-
 });
-
 
 /**
  * @api {post} /master/config/update POST Update Member Config
