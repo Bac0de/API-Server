@@ -243,14 +243,14 @@ router.post('/vm/update', function (req,res) {
  */
 
 router.post('/vm/delete', function (req, res) {
-	if(!req.body.id) {
+	if(!req.body.data) {
 		res.writeHead(400);
 		return res.end(JSON.stringify({message: "Parameter \"id\" require"}));
 	}
 
-	var id = req.body.id;
+	var data = JSON.parse(req.body.data);
 
-	VM.distory({where: id});
+	VM.destroy({where: data});
 
 	res.writeHead(200);
 
