@@ -217,7 +217,7 @@ router.post('/vm/update', function (req,res) {
 });
 
 /**
- * @api {get} /common/vm/delete POST Delete VM
+ * @api {POST} /common/vm/delete POST Delete VM
  * @apiDescription
  *		Delete  VM Information.
  *		
@@ -302,6 +302,49 @@ router.post('/vm/control', function (req,res) {
 
 	exec(data.command, function (error, stdout, stderr) {
 		console.log(stdout);
+	});
+
+	res.writeHead(200);
+
+	return res.end(JSON.stringify({message: "ok"}));
+});
+
+
+/**
+ * @api {get} /common/vm/control POST Control VM
+ * @apiDescription
+ *		Control the VM.
+ * @apiName ControlVM
+ * @apiGroup Common
+ * 
+ * @apiParam {string} data command field:control command 
+ * @apiParamExample {string} data
+ *		{
+ *			"command":"./reboot 1"
+ *		}
+ * @apiSuccess {string} message just set "ok".
+ * @apiSuccessexample Success-response:
+ * 		http/1.1 200 ok
+ *		{
+ *			"message":"ok"
+ *		}
+ * @apiError {string} message reason of error.
+ * @apiErrorExample Error-response:
+ * 		http/1.1 400 Bad Bad Request.
+ *		{
+ *			"message":"Parameter \"data\" require"
+ *		}
+ */
+router.post('/vm/restore', function (req,res) {
+	if(!req.body.data) {
+		res.writeHead(400);
+		return res.end(JSON.stringify({message: "Parameter \"data\" require"}));
+	}
+	
+	data = JSON.parse(req.body.data);
+
+	exec('/etc/batu/control/create.sh ' + data.to + ' ' + data.from, function (error, stdout, stderr) {
+		
 	});
 
 	res.writeHead(200);
